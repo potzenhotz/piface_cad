@@ -4,7 +4,7 @@ import json
 from urllib.request import urlopen
 import api_key
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 #Parameters
 #-----------------------------------------------------------------------
 num_of_pins=8
@@ -12,10 +12,9 @@ lat=53.86
 lon=10.68
 
 class weather:
-
 	def __init__(self, lat, lon):
-		self.weather_url = self.set_weather_url(api_key.open_weather_app_key, lat, lon)
-		self.weather_obj = self.get_weather(self.weather_url)
+		self.weather_url = self.set_weather_url(api_key.open_weather_api_key, lat, lon)
+		self.weather_dict = self.get_weather(self.weather_url)
 
 	def set_weather_url(self, open_weater_app_key, lat, lon):
 		raw_url = "https://api.openweathermap.org/data/2.5/weather?"
@@ -31,9 +30,46 @@ class weather:
 	def get_weather(self, weather_url):
 		jsonFile = urlopen(weather_url)
 		jsonFileContent = jsonFile.read().decode('utf-8')
-		weather_obj = json.loads(jsonFileContent)
-		return weather_obj
+		weather_dict = json.loads(jsonFileContent)
+		return weather_dict
+	
+	def get_condition(self):
+		"""weather contains dicts inside a list"""
+		return self.weather_dict["weather"][0]["main"]
 
+	def get_temp(self):
+		return self.weather_dict["main"]["temp"]
+
+	def get_temp_min(self):
+		return self.weather_dict["main"]["temp_min"]
+
+	def get_temp_max(self):
+		return self.weather_dict["main"]["temp_max"]
+
+	def get_humidity(self):
+		return self.weather_dict["main"]["humidity"]
+
+	def get_pressure(self):
+		return self.weather_dict["main"]["pressure"]
+
+	def get_wind_speed(self):
+		return self.weather_dict["wind"]["speed"]
+
+	def get_wind_dir(self):
+		try:
+			return self.weather_dict["wind"]["deg"]
+		except:
+			return "NaN"
 
 if __name__=="__main__":
 	weather = weather(lat, lon)
+	#print(weather.weather_dict)
+	print(weather.get_condition())
+	print(weather.get_temp())
+	print(weather.get_temp_min())
+	print(weather.get_temp_max())
+	print(weather.get_humidity())
+	print(weather.get_pressure())
+	print(weather.get_wind_speed())
+	print(weather.get_wind_dir())
+
