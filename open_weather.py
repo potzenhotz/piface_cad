@@ -14,7 +14,7 @@ lon=10.68
 class weather:
 
 	def __init__(self, lat, lon):
-		self.weather_url = self.set_weather_url(api_key.open_weater_app_key, lat, lon)
+		self.weather_url = self.set_weather_url(api_key.open_weather_app_key, lat, lon)
 		self.weather_obj = self.get_weather(self.weather_url)
 
 	def set_weather_url(self, open_weater_app_key, lat, lon):
