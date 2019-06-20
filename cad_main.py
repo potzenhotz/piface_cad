@@ -28,7 +28,8 @@ class cad:
 		self.cad.lcd.cursor_off()
 		self.cad.lcd.blink_off()
 		self.weather = weather_api.weather(lat, lon)
-		self.spiegel_headlines = news_api.spiegel_news()
+		self.spiegel_news = news_api.spiegel_news()
+		self.spiegel_headlines = spiegel_news.headlines()
 		self.loop_index_weather = 0
 		self.loop_index_news = 0
 
