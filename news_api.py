@@ -25,6 +25,11 @@ class news_api:
 	def replace_non_breaking_space(self, string):
 		return string.replace(u'\xa0', u' ')
 
+	def replace_umlaute(self, string):
+		umlaute = {'ö':'oe','ä':'ae','ü':'ue', 'Ö': 'Oe', 'Ü':'Ue', 'Ä':'Ae'}
+		for umlaut in umlaute:
+		    string = string.replace(umlaut,umlaute[umlaut])
+
 class spiegel_news(news_api):
 	def __init__(self):
 		super().__init__("spiegel-online")
@@ -34,6 +39,7 @@ class spiegel_news(news_api):
 		headlines = []
 		for article in self.news["articles"]:
 			headline = self.replace_non_breaking_space(article["title"])
+			headline = self.replace_umlaute(headline)
 			headlines.append(headline)
 		return headlines
 	

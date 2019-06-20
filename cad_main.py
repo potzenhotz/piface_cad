@@ -23,13 +23,14 @@ lon=10.68
 #-----------------------------------------------------------------------
 class cad:
 	def __init__(self):
+		self.len_of_screen = 16
 		self.cad = pifacecad.PiFaceCAD()
 		self.cad.lcd.backlight_on()
 		self.cad.lcd.cursor_off()
 		self.cad.lcd.blink_off()
 		self.weather = weather_api.weather(lat, lon)
-		self.spiegel_news = news_api.spiegel_news()
-		self.spiegel_headlines = spiegel_news.headlines()
+		self.spiegel = news_api.spiegel_news()
+		self.spiegel_headlines = self.spiegel.get_headlines()
 		self.loop_index_weather = 0
 		self.loop_index_news = 0
 
@@ -67,8 +68,11 @@ class cad:
 			self.loop_index_news = 0
 		if self.loop_index_news ==0:
 			event.chip.lcd.write("Updating Data:")
-			self.spiegel_headlines.update_news()
-		return event.chip.lcd.write(self.spiegel_headlines[self.loop_index_news])
+			event.chip.lcd.clear()
+			self.spiegel.update_news()
+		self.move_txt_on_screen(event, self.spiegel_headlines[self.loop_index_news])
+		return
+		#return event.chip.lcd.write(self.spiegel_headlines[self.loop_index_news])
 	
 	def handlePin(self, event):
 		event.chip.lcd.clear()
@@ -95,6 +99,18 @@ class cad:
 	
 	def turn_off(self):
 		self.cad.lcd.backlight_off()
+
+	def move_txt_on_screen(self, event, text):
+		print(text)
+		loop_count = len(text) - self.len_of_screen + 1
+		if loop_count <= 0:
+			event.chip.lcd.write(text)
+		else:
+			for i in range(loop_count):
+				#event.chip.lcd.clear()
+				event.chip.lcd.set_cursor(0,0)
+				event.chip.lcd.write(text[i:self.len_of_screen+i])
+				time.sleep(0.2)
 
 if __name__ == "__main__":
 	cad_instance = cad()
