@@ -24,6 +24,8 @@ lon=10.68
 class cad:
 	def __init__(self):
 		self.len_of_screen = 16
+		self.txt_speed = 0.05
+		self.txt_speed_start = 0.8
 		self.cad = pifacecad.PiFaceCAD()
 		self.cad.lcd.backlight_on()
 		self.cad.lcd.cursor_off()
@@ -68,11 +70,10 @@ class cad:
 			self.loop_index_news = 0
 		if self.loop_index_news ==0:
 			event.chip.lcd.write("Updating Data:")
+			time.sleep(0.5)
 			event.chip.lcd.clear()
 			self.spiegel.update_news()
 		self.move_txt_on_screen(event, self.spiegel_headlines[self.loop_index_news])
-		return
-		#return event.chip.lcd.write(self.spiegel_headlines[self.loop_index_news])
 	
 	def handlePin(self, event):
 		event.chip.lcd.clear()
@@ -101,16 +102,17 @@ class cad:
 		self.cad.lcd.backlight_off()
 
 	def move_txt_on_screen(self, event, text):
-		print(text)
 		loop_count = len(text) - self.len_of_screen + 1
 		if loop_count <= 0:
 			event.chip.lcd.write(text)
 		else:
 			for i in range(loop_count):
-				#event.chip.lcd.clear()
 				event.chip.lcd.set_cursor(0,0)
 				event.chip.lcd.write(text[i:self.len_of_screen+i])
-				time.sleep(0.2)
+				if i == 0:
+					time.sleep(self.txt_speed+self.txt_speed_start)
+				else:
+					time.sleep(self.txt_speed)
 
 if __name__ == "__main__":
 	cad_instance = cad()

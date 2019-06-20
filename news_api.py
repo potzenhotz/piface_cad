@@ -29,6 +29,7 @@ class news_api:
 		umlaute = {'ö':'oe','ä':'ae','ü':'ue', 'Ö': 'Oe', 'Ü':'Ue', 'Ä':'Ae'}
 		for umlaut in umlaute:
 		    string = string.replace(umlaut,umlaute[umlaut])
+		return string
 
 class spiegel_news(news_api):
 	def __init__(self):
