@@ -5,6 +5,7 @@ if sys.version[0] != '3':
 	sys.exit(0)
 import pifacecad
 import open_weather as weather_api
+import news_api
 import time
 
 
@@ -27,7 +28,9 @@ class cad:
 		self.cad.lcd.cursor_off()
 		self.cad.lcd.blink_off()
 		self.weather = weather_api.weather(lat, lon)
-		self.loop_index = 0
+		self.spiegel_headlines = news_api.spiegel_news()
+		self.loop_index_weather = 0
+		self.loop_index_news = 0
 
 	def create_weather_list(self):
 		self.weather_list = []
@@ -51,19 +54,31 @@ class cad:
 		self.weather_list.extend(["T_Max: {0} C\n{1}".format(temp_max, condition)])
 
 	def press_button_0(self, event):
-		if self.loop_index == len(self.weather_list):
-			self.loop_index = 0
-		if self.loop_index ==0:
+		if self.loop_index_weather == len(self.weather_list):
+			self.loop_index_weather = 0
+		if self.loop_index_weather ==0:
 			event.chip.lcd.write("Updating Data:")
 			self.weather.update_weather()
-		return event.chip.lcd.write(self.weather_list[self.loop_index])
+		return event.chip.lcd.write(self.weather_list[self.loop_index_weather])
+
+	def press_button_2(self, event):
+		if self.loop_index_news == len(self.spiegel_headlines):
+			self.loop_index_news = 0
+		if self.loop_index_news ==0:
+			event.chip.lcd.write("Updating Data:")
+			self.spiegel_headlines.update_news()
+		return event.chip.lcd.write(self.spiegel_headlines[self.loop_index_news])
 	
 	def handlePin(self, event):
 		event.chip.lcd.clear()
 		if(event.pin_num == 0):
 			self.cad.lcd.backlight_on()
 			self.press_button_0(event)
-			self.loop_index += 1
+			self.loop_index_weather += 1
+		elif(event.pin_num == 2):
+			self.cad.lcd.backlight_on()
+			self.press_button_2(event)
+			self.loop_index_news += 1
 		elif(event.pin_num == 4):
 			self.turn_off()
 		else:

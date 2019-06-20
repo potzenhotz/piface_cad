@@ -19,6 +19,9 @@ class news_api:
 		resp = requests.get(self.url)
 		return resp.json()
 
+	def update_news(self):
+		self.news = self.get_news()
+
 	def replace_non_breaking_space(self, string):
 		return string.replace(u'\xa0', u' ')
 
@@ -33,6 +36,7 @@ class spiegel_news(news_api):
 			headline = self.replace_non_breaking_space(article["title"])
 			headlines.append(headline)
 		return headlines
+	
 
 
 if __name__=="__main__":
