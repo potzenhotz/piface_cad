@@ -8,13 +8,6 @@ import open_weather as weather_api
 import news_api
 import time
 
-
-#if ascii error is raised:
-#export PYTHONIOENCODING=utf-8
-#-----------------------------------------------------------------------
-#Parameters
-#-----------------------------------------------------------------------
-
 #-----------------------------------------------------------------------
 #Class
 #-----------------------------------------------------------------------
@@ -23,7 +16,7 @@ class cad:
 		self.len_of_screen = 16
 		self.txt_speed = 0.05
 		self.txt_speed_start = 0.8
-		self.num_of_pins=8-1
+		self.num_of_pins=8
 		self.set_cities()
 		self.cad = pifacecad.PiFaceCAD()
 		self.cad.lcd.backlight_on()
@@ -89,12 +82,12 @@ class cad:
 		pass
 
 	def press_button_6(self, event):
-		self.loop_index_cities =- 1
-		return event.chip.lcd.write(self.cities[self.loop_index_cities])
+		self.loop_index_cities = self.sub_one_of__counter(self.loop_index_cities, len(self.cities)-1)
+		return event.chip.lcd.write(list(self.cities)[self.loop_index_cities])
 
 	def press_button_7(self, event):
-		self.loop_index_cities =+ 1
-		return event.chip.lcd.write(self.cities[self.loop_index_cities])
+		self.loop_index_cities = self.add_one_to_counter(self.loop_index_cities, len(self.cities)-1)
+		return event.chip.lcd.write(list(self.cities)[self.loop_index_cities])
 	
 	def handlePin(self, event):
 		event.chip.lcd.clear()
@@ -108,6 +101,12 @@ class cad:
 			self.loop_index_news += 1
 		elif(event.pin_num == 4):
 			self.press_button_4(event)
+		elif(event.pin_num == 5):
+			self.press_button_5(event)
+		elif(event.pin_num == 6):
+			self.press_button_6(event)
+		elif(event.pin_num == 7):
+			self.press_button_7(event)
 		else:
 			self.cad.lcd.backlight_on()
 			event.chip.lcd.write("Button: \n")
@@ -134,6 +133,18 @@ class cad:
 					time.sleep(self.txt_speed+self.txt_speed_start)
 				else:
 					time.sleep(self.txt_speed)
+	
+	def add_one_to_counter(self, counter, max_counter):
+		if counter == max_counter:
+			return 0
+		else:
+			return counter + 1
+
+	def sub_one_of__counter(self, counter, max_counter):
+		if counter == 0:
+			return max_counter
+		else:
+			return counter - 1
 
 if __name__ == "__main__":
 	cad_instance = cad()
