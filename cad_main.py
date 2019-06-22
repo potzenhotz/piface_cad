@@ -14,9 +14,6 @@ import time
 #-----------------------------------------------------------------------
 #Parameters
 #-----------------------------------------------------------------------
-num_of_pins=8
-lat=53.86
-lon=10.68
 
 #-----------------------------------------------------------------------
 #Class
@@ -26,19 +23,28 @@ class cad:
 		self.len_of_screen = 16
 		self.txt_speed = 0.05
 		self.txt_speed_start = 0.8
+		self.num_of_pins=8-1
+		self.set_cities()
 		self.cad = pifacecad.PiFaceCAD()
 		self.cad.lcd.backlight_on()
 		self.cad.lcd.cursor_off()
 		self.cad.lcd.blink_off()
-		self.weather = weather_api.weather(lat, lon)
+		self.weather = weather_api.weather(self.cities["Luebeck"][0], self.cities["Luebeck"][1])
 		self.spiegel = news_api.spiegel_news()
 		self.spiegel_headlines = self.spiegel.get_headlines()
 		self.loop_index_weather = 0
 		self.loop_index_news = 0
+		self.loop_index_cities = 0
+	
+	def set_cities(self):
+		self.cities = {}
+		self.cities["Luebeck"] = [53.86, 10,68]
+		self.cities["Dortmund"] = [51.51, 7.46]
+		self.cities["Essen"] = [51.45, 7.01]
+		
 
 	def create_weather_list(self):
 		self.weather_list = []
-		deg_symbol = u'\N{DEGREE SIGN}'
 		condition = self.weather.get_condition()
 		temp = self.weather.get_temp()
 		humidity = self.weather.get_humidity()
@@ -75,6 +81,21 @@ class cad:
 			self.spiegel.update_news()
 		self.move_txt_on_screen(event, self.spiegel_headlines[self.loop_index_news])
 	
+	def press_button_4(self, event):
+		event.chip.lcd.clear()
+		self.turn_off()
+
+	def press_button_5(self, event):
+		pass
+
+	def press_button_6(self, event):
+		self.loop_index_cities =- 1
+		return event.chip.lcd.write(self.cities[self.loop_index_cities])
+
+	def press_button_7(self, event):
+		self.loop_index_cities =+ 1
+		return event.chip.lcd.write(self.cities[self.loop_index_cities])
+	
 	def handlePin(self, event):
 		event.chip.lcd.clear()
 		if(event.pin_num == 0):
@@ -86,7 +107,7 @@ class cad:
 			self.press_button_2(event)
 			self.loop_index_news += 1
 		elif(event.pin_num == 4):
-			self.turn_off()
+			self.press_button_4(event)
 		else:
 			self.cad.lcd.backlight_on()
 			event.chip.lcd.write("Button: \n")
@@ -94,7 +115,7 @@ class cad:
 	
 	def start_listener(self):
 		listener = pifacecad.SwitchEventListener(chip=self.cad)
-		for i in range(num_of_pins):
+		for i in range(self.num_of_pins):
 			listener.register(i, pifacecad.IODIR_FALLING_EDGE, self.handlePin)
 		listener.activate()
 	
