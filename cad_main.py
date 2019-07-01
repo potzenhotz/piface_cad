@@ -63,13 +63,15 @@ class cad:
 	
 	def press_button_4(self, event):
 		event.chip.lcd.clear()
-		for i in range(3):
+		for i in range(3,0,-1):
 			event.chip.lcd.write("Turning off in {}".format(i+1))
 			time.sleep(1)
 			event.chip.lcd.set_cursor(0,0)
+		event.chip.lcd.clear()
 		event.chip.lcd.write("Turning off...")
 		time.sleep(1)
-		self.turn_off()
+		self.turn_screen_off()
+		self.turn_off_pi()
 
 	def press_button_5(self, event):
 		self.city = list(self.cities)[self.loop_index_cities]
@@ -114,7 +116,7 @@ class cad:
 			listener.register(i, pifacecad.IODIR_FALLING_EDGE, self.handlePin)
 		listener.activate()
 	
-	def turn_off(self):
+	def turn_screen_off(self):
 		self.cad.lcd.backlight_off()
 
 	def move_txt_on_screen(self, event, text):
