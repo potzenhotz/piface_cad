@@ -64,12 +64,13 @@ class cad:
 	def press_button_4(self, event):
 		event.chip.lcd.clear()
 		for i in range(3,0,-1):
-			event.chip.lcd.write("Turning off in {}".format(i+1))
+			event.chip.lcd.write("Turning off in {}".format(i))
 			time.sleep(1)
 			event.chip.lcd.set_cursor(0,0)
 		event.chip.lcd.clear()
 		event.chip.lcd.write("Turning off...")
 		time.sleep(1)
+		event.chip.lcd.clear()
 		self.turn_screen_off()
 		self.turn_off_pi()
 
@@ -144,7 +145,7 @@ class cad:
 		else:
 			return counter - 1
 
-	def turn_off_pi():
+	def turn_off_pi(self):
 		subprocess.call(["sudo", "shutdown", "-h", "0"])
 
 if __name__ == "__main__":
