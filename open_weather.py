@@ -35,6 +35,7 @@ class weather:
 	
 	def update_weather(self):
 		self.__weather_dict = self.get_weather()
+		return self.create_weather_list()
 	
 	def get_condition(self):
 		"""weather contains dicts inside a list"""
@@ -63,6 +64,27 @@ class weather:
 			return self.__weather_dict["wind"]["deg"]
 		except:
 			return "NaN"
+
+	def create_weather_list(self):
+		self.weather_list = []
+		condition = self.get_condition()
+		temp = self.get_temp()
+		humidity = self.get_humidity()
+		pressure = self.get_pressure()
+		temp_min = self.get_temp_min()
+		temp_max = self.get_temp_max()
+		wind_speed = self.get_wind_speed()
+		wind_dir = self.get_wind_dir()
+		self.weather_list.extend(["{0}\nTemp: {1} C".format(condition, temp)])
+		self.weather_list.extend(["Temp: {0} C\nPress: {1} hPa".format(temp, pressure)])
+		self.weather_list.extend(["Press: {0} hPa\nHumidity: {1}%".format(pressure, humidity)])
+		self.weather_list.extend(["Humidity: {0}%\nW-Speed: {1} m/s".format(humidity, wind_speed)])
+		self.weather_list.extend(["W-Speed: {0} m/s\nW-Dir: {1}".format(wind_speed, wind_dir)])
+		self.weather_list.extend(["W-Dir: {0}\nT_Min: {1} C".format(wind_dir, temp_min)])
+		self.weather_list.extend(["T_Min: {0} C\nT_Max: {1} C".format(temp_min, temp_max)])
+		self.weather_list.extend(["T_Max: {0} C\n{1}".format(temp_max, condition)])
+		return self.weather_list
+
 
 if __name__=="__main__":
 	weather = weather(lat, lon)

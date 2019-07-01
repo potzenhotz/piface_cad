@@ -7,6 +7,7 @@ import pifacecad
 import open_weather as weather_api
 import news_api
 import time
+import subprocess
 
 #-----------------------------------------------------------------------
 #Class
@@ -22,7 +23,8 @@ class cad:
 		self.cad.lcd.backlight_on()
 		self.cad.lcd.cursor_off()
 		self.cad.lcd.blink_off()
-		self.weather = weather_api.weather(self.cities["Luebeck"][0], self.cities["Luebeck"][1])
+		self.city = "Luebeck"
+		self.weather = weather_api.weather(self.cities[self.city][0], self.cities[self.city][1])
 		self.spiegel = news_api.spiegel_news()
 		self.spiegel_headlines = self.spiegel.get_headlines()
 		self.loop_index_weather = 0
@@ -36,32 +38,17 @@ class cad:
 		self.cities["Essen"] = [51.45, 7.01]
 		
 
-	def create_weather_list(self):
-		self.weather_list = []
-		condition = self.weather.get_condition()
-		temp = self.weather.get_temp()
-		humidity = self.weather.get_humidity()
-		pressure = self.weather.get_pressure()
-		temp_min = self.weather.get_temp_min()
-		temp_max = self.weather.get_temp_max()
-		wind_speed = self.weather.get_wind_speed()
-		wind_dir = self.weather.get_wind_dir()
-		self.weather_list.extend(["\n{0}".format(condition)])
-		self.weather_list.extend(["{0}\nTemp: {1} C".format(condition, temp)])
-		self.weather_list.extend(["Temp: {0} C\nPress: {1} hPa".format(temp, pressure)])
-		self.weather_list.extend(["Press: {0} hPa\nHumidity: {1}%".format(pressure, humidity)])
-		self.weather_list.extend(["Humidity: {0}%\nW-Speed: {1} m/s".format(humidity, wind_speed)])
-		self.weather_list.extend(["W-Speed: {0} m/s\nW-Dir: {1}".format(wind_speed, wind_dir)])
-		self.weather_list.extend(["W-Dir: {0}\nT_Min: {1} C".format(wind_dir, temp_min)])
-		self.weather_list.extend(["T_Min: {0} C\nT_Max: {1} C".format(temp_min, temp_max)])
-		self.weather_list.extend(["T_Max: {0} C\n{1}".format(temp_max, condition)])
+	def initialize_weather(self):
+		self.weather_list = self.weather.create_weather_list()
 
 	def press_button_0(self, event):
 		if self.loop_index_weather == len(self.weather_list):
 			self.loop_index_weather = 0
 		if self.loop_index_weather ==0:
-			event.chip.lcd.write("Updating Data:")
-			self.weather.update_weather()
+			event.chip.lcd.write("Updating Data:\n{0}".format(self.city))
+			self.weather_list = self.weather.update_weather()
+			time.sleep(0.3)
+			event.chip.lcd.clear()
 		return event.chip.lcd.write(self.weather_list[self.loop_index_weather])
 
 	def press_button_2(self, event):
@@ -76,10 +63,19 @@ class cad:
 	
 	def press_button_4(self, event):
 		event.chip.lcd.clear()
+		for i in range(3):
+			event.chip.lcd.write("Turning off in {}".format(i+1))
+			time.sleep(1)
+			event.chip.lcd.set_cursor(0,0)
+		event.chip.lcd.write("Turning off...")
+		time.sleep(1)
 		self.turn_off()
 
 	def press_button_5(self, event):
-		pass
+		self.city = list(self.cities)[self.loop_index_cities]
+		self.weather = weather_api.weather(self.cities[self.city][0], self.cities[self.city][1])
+		self.loop_index_weather = 0
+		return event.chip.lcd.write("City is set to:\n{}".format(self.city))
 
 	def press_button_6(self, event):
 		self.loop_index_cities = self.sub_one_of__counter(self.loop_index_cities, len(self.cities)-1)
@@ -146,7 +142,10 @@ class cad:
 		else:
 			return counter - 1
 
+	def turn_off_pi():
+		subprocess.call(["sudo", "shutdown", "-h", "0"])
+
 if __name__ == "__main__":
 	cad_instance = cad()
 	cad_instance.start_listener()
-	cad_instance.create_weather_list()
+	cad_instance.initialize_weather()
