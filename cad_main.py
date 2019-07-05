@@ -65,7 +65,7 @@ class cad:
 	def press_button_4(self, event):
 		event.chip.lcd.clear()
 		if self.turn_off_counter == 0:
-			event.chip.lcd.write("Turn off?\n Press again!")
+			event.chip.lcd.write("Turn off?\nPress again!")
 			self.turn_off_counter += 1
 		else:
 			for i in range(3,0,-1):
