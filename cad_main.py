@@ -30,6 +30,7 @@ class cad:
 		self.loop_index_weather = 0
 		self.loop_index_news = 0
 		self.loop_index_cities = 0
+		self.turn_off_counter = 0
 		self.cad.lcd.write("CAD Ready") 
 	
 	def set_cities(self):
@@ -63,16 +64,20 @@ class cad:
 	
 	def press_button_4(self, event):
 		event.chip.lcd.clear()
-		for i in range(3,0,-1):
-			event.chip.lcd.write("Turning off in {}".format(i))
+		if self.turn_off_counter == 0:
+			event.chip.lcd.write("Turn off?\n Press again!")
+			self.turn_off_counter += 1
+		else:
+			for i in range(3,0,-1):
+				event.chip.lcd.write("Turning off in {}".format(i))
+				time.sleep(1)
+				event.chip.lcd.set_cursor(0,0)
+			event.chip.lcd.clear()
+			event.chip.lcd.write("Turning off...")
 			time.sleep(1)
-			event.chip.lcd.set_cursor(0,0)
-		event.chip.lcd.clear()
-		event.chip.lcd.write("Turning off...")
-		time.sleep(1)
-		event.chip.lcd.clear()
-		self.turn_screen_off()
-		self.turn_off_pi()
+			event.chip.lcd.clear()
+			self.turn_screen_off()
+			self.turn_off_pi()
 
 	def press_button_5(self, event):
 		self.city = list(self.cities)[self.loop_index_cities]
