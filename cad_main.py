@@ -30,13 +30,13 @@ class cad:
 		self.loop_index_weather = 0
 		self.loop_index_news = 0
 		self.loop_index_cities = 0
+		self.cad.lcd.write("CAD Ready") 
 	
 	def set_cities(self):
 		self.cities = {}
 		self.cities["Luebeck"] = [53.86, 10,68]
 		self.cities["Dortmund"] = [51.51, 7.46]
 		self.cities["Essen"] = [51.45, 7.01]
-		
 
 	def initialize_weather(self):
 		self.weather_list = self.weather.create_weather_list()
